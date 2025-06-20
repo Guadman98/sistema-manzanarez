@@ -10,6 +10,19 @@ export class GradoService {
     private gradoRepo: Repository<Grado>,
   ) {}
 
+  async obtenerEstudiantesPorGrado(gradoId: number) {
+    const grado = await this.gradoRepo.findOne({
+      where: { id: gradoId },
+      relations: ['estudiantes'],
+    });
+
+    if (!grado) {
+      throw new Error('Grado no encontrado');
+    }
+
+    return grado.estudiantes;
+  }
+
   findAll(): Promise<Grado[]> {
     return this.gradoRepo.find();
   }

@@ -24,6 +24,11 @@ export class GradoController {
     return this.gradoService.findOne(id);
   }
 
+  @Get(':id/estudiantes')
+  async getEstudiantes(@Param('id') id: number) {
+    return this.gradoService.obtenerEstudiantesPorGrado(id);
+  }
+
   @Post()
   create(@Body() body: Partial<Grado>) {
     return this.gradoService.create(body);

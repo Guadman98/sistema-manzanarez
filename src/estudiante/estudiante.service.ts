@@ -11,7 +11,7 @@ export class EstudianteService {
   ) {}
 
   findAll(): Promise<Estudiante[]> {
-    return this.estudianteRepo.find();
+    return this.estudianteRepo.find({ relations: ['grado'] });
   }
 
   findOne(id: number): Promise<Estudiante | null> {
