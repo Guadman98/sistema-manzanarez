@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Grado } from 'src/grado/grado.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Estudiante extends BaseEntity {
@@ -33,4 +34,7 @@ export class Estudiante extends BaseEntity {
 
   @Column({ default: 'Activo' })
   estatus: string;
+
+  @ManyToOne(() => Grado, (grado) => grado.estudiantes)
+  grado: Grado;
 }

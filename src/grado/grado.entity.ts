@@ -1,5 +1,14 @@
+import { Asignatura } from 'src/asignatura/asignatura.entity';
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Estudiante } from 'src/estudiante/estudiante.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  OneToMany,
+  ManyToMany,
+  JoinTable,
+} from 'typeorm';
 
 @Entity()
 export class Grado extends BaseEntity {
@@ -14,4 +23,11 @@ export class Grado extends BaseEntity {
 
   @Column()
   horario: string;
+
+  @OneToMany(() => Estudiante, (estudiante) => estudiante.grado)
+  estudiantes: Estudiante[];
+
+  @ManyToMany(() => Asignatura, (asignatura) => asignatura.grados)
+  @JoinTable()
+  asignaturas: Asignatura[];
 }

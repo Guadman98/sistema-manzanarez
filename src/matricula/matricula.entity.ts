@@ -1,5 +1,8 @@
+import { Asignatura } from 'src/asignatura/asignatura.entity';
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Estudiante } from 'src/estudiante/estudiante.entity';
+import { Profesor } from 'src/profesor/profesor.entity';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
 @Entity()
 export class Matricula extends BaseEntity {
@@ -17,4 +20,16 @@ export class Matricula extends BaseEntity {
 
   @Column({ default: 'Activo' })
   estado: string;
+
+  @ManyToOne(() => Estudiante)
+  estudiante: Estudiante;
+
+  @ManyToOne(() => Asignatura)
+  materia: Asignatura;
+
+  @ManyToOne(() => Profesor)
+  profesor: Profesor;
+
+  @Column()
+  anio_escolar: number;
 }

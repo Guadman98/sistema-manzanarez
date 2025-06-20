@@ -10,6 +10,19 @@ export class ProfesorService {
     private profesorRepo: Repository<Profesor>,
   ) {}
 
+  async obtenerAsignaturasPorProfesor(profesorId: number) {
+    const profesor = await this.profesorRepo.findOne({
+      where: { id: profesorId },
+      relations: ['asignaturas'],
+    });
+
+    if (!profesor) {
+      throw new Error('Profesor no encontrado');
+    }
+
+    return profesor.asignaturas;
+  }
+
   findAll(): Promise<Profesor[]> {
     return this.profesorRepo.find();
   }

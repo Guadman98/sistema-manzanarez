@@ -1,6 +1,6 @@
-/* eslint-disable prettier/prettier */
+import { Asignatura } from 'src/asignatura/asignatura.entity';
 import { BaseEntity } from 'src/common/entities/base.entity';
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity()
 export class Profesor extends BaseEntity {
@@ -33,4 +33,7 @@ export class Profesor extends BaseEntity {
 
   @Column({ default: 'Activo' })
   estatus: string;
+
+  @OneToMany(() => Asignatura, (asignatura) => asignatura.profesor)
+  asignaturas: Asignatura[];
 }
