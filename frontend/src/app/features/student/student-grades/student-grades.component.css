@@ -1,0 +1,4 @@
+/* Custom tooltips and transitions for student grades */
+.group\/period:hover .group-hover\/period\:block {
+  display: block;
+}

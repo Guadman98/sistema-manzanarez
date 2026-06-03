@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: lem_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: lem_user
+      POSTGRES_PASSWORD: lem_password
+      POSTGRES_DB: lem_db
+    ports:
+      - '5434:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

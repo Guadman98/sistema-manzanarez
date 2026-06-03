@@ -1,0 +1,165 @@
+<div class="space-y-6 max-w-4xl mx-auto">
+  <!-- Header -->
+  <div>
+    <h1 class="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+      <span class="p-2 bg-eco-500/10 rounded-2xl border border-eco-500/20 text-eco-400">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z" />
+        </svg>
+      </span>
+      Bitácora de Convivencia Escolar
+    </h1>
+    <p class="text-slate-400 mt-2 font-medium">
+      Monitoree su historial de comportamiento, compromisos adoptados en el aula y recomendaciones pedagógicas registradas.
+    </p>
+  </div>
+
+  <!-- Loading Skeletons -->
+  @if (isLoading()) {
+    <div class="space-y-6 animate-pulse">
+      <div class="h-24 w-full bg-slate-900/60 rounded-3xl"></div>
+      <div class="space-y-4">
+        @for (i of [1, 2]; track i) {
+          <div class="flex gap-4">
+            <div class="w-8 h-8 rounded-full bg-slate-800 shrink-0"></div>
+            <div class="flex-1 h-32 bg-slate-900/60 rounded-2xl"></div>
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    <!-- Error State -->
+    @if (errorMessage()) {
+      <div class="p-6 glass-panel border border-red-500/20 bg-red-500/5 rounded-3xl text-red-300 flex items-start gap-4">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 shrink-0 text-red-400">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+        </svg>
+        <div>
+          <h3 class="text-lg font-bold text-white">Error de Consulta</h3>
+          <p class="text-slate-300 mt-1 text-sm">{{ errorMessage() }}</p>
+        </div>
+      </div>
+    } @else {
+      <!-- Summary metrics -->
+      <div class="glass-panel border border-white/5 rounded-3xl p-6 shadow-2xl">
+        <h3 class="text-sm font-extrabold text-white uppercase tracking-wider mb-4">Resumen de Convivencia</h3>
+        <div class="grid grid-cols-3 gap-4">
+          <!-- Leve Box -->
+          <div class="bg-slate-950/45 border border-white/5 p-4 rounded-2xl text-center space-y-1">
+            <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Reportes Leves</span>
+            <div class="text-3xl font-black font-mono text-yellow-400">{{ getLeveCount() }}</div>
+          </div>
+
+          <!-- Convivencia Box -->
+          <div class="bg-slate-950/45 border border-white/5 p-4 rounded-2xl text-center space-y-1">
+            <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Compromisos</span>
+            <div class="text-3xl font-black font-mono text-orange-400">{{ getConvivenciaCount() }}</div>
+          </div>
+
+          <!-- Grave Box -->
+          <div
+            [class]="getGraveCount() > 0 ? 'bg-red-950/15 border border-red-500/20 p-4 rounded-2xl text-center space-y-1 animate-pulse' : 'bg-slate-950/45 border border-white/5 p-4 rounded-2xl text-center space-y-1'"
+          >
+            <span class="text-[10px] font-extrabold uppercase tracking-widest text-slate-400">Faltas Graves</span>
+            <div
+              [class]="getGraveCount() > 0 ? 'text-3xl font-black font-mono text-red-400 shadow-sm' : 'text-3xl font-black font-mono text-slate-500'"
+            >
+              {{ getGraveCount() }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline structure of observations -->
+      @if (observaciones().length > 0) {
+        <div class="relative pl-6 md:pl-10 space-y-6">
+          <!-- Central line trace of timeline -->
+          <div class="absolute left-3 md:left-5 top-2 bottom-2 w-0.5 bg-slate-800"></div>
+
+          @for (obs of observaciones(); track obs.id) {
+            <div class="relative group flex flex-col md:flex-row gap-4 items-start">
+              
+              <!-- Indicator Timeline Node Dot -->
+              <span
+                [class]="
+                  obs.categoria === 'LEVE' ? 'absolute -left-6 md:-left-8.5 top-2.5 h-4 w-4 rounded-full border-2 border-slate-950 bg-yellow-500 shadow shadow-yellow-500/20' : 
+                  obs.categoria === 'CONVIVENCIA' ? 'absolute -left-6 md:-left-8.5 top-2.5 h-4 w-4 rounded-full border-2 border-slate-950 bg-orange-500 shadow shadow-orange-500/20' : 
+                  'absolute -left-6 md:-left-8.5 top-2.5 h-4 w-4 rounded-full border-2 border-slate-950 bg-red-500 shadow shadow-red-500/30'
+                "
+              ></span>
+
+              <!-- Observation Details card -->
+              <div
+                [class]="
+                  obs.categoria === 'LEVE' ? 'w-full glass-card hover:glass-panel border-l-4 border-l-yellow-500 border-white/5 p-5 rounded-2xl shadow transition-all duration-300' : 
+                  obs.categoria === 'CONVIVENCIA' ? 'w-full glass-card hover:glass-panel border-l-4 border-l-orange-500 border-white/5 p-5 rounded-2xl shadow transition-all duration-300' : 
+                  'w-full glass-panel border-l-4 border-l-red-500 border-red-500/10 bg-red-950/5 p-5 rounded-2xl shadow-xl hover:shadow-red-950/5 transition-all duration-300'
+                "
+              >
+                <!-- Card Header -->
+                <div class="flex items-center justify-between gap-4 mb-3 flex-wrap">
+                  <div class="flex items-center gap-2">
+                    @if (obs.categoria === 'LEVE') {
+                      <span class="px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider bg-yellow-500/15 border border-yellow-500/30 text-yellow-300 rounded-md">
+                        REPORTE LEVE
+                      </span>
+                    } @else if (obs.categoria === 'CONVIVENCIA') {
+                      <span class="px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider bg-orange-500/15 border border-orange-500/30 text-orange-300 rounded-md">
+                        PULSO DE CONVIVENCIA
+                      </span>
+                    } @else {
+                      <span class="px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wider bg-red-500/15 border border-red-500/30 text-red-400 rounded-md animate-pulse">
+                        ALERTA DE FALTA GRAVE
+                      </span>
+                    }
+                  </div>
+
+                  <!-- Date picker representation -->
+                  <div class="text-[10px] font-mono font-bold text-slate-400 flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 text-slate-500">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                    </svg>
+                    <span>Fecha: {{ obs.fecha_incidente | date: 'dd/MM/yyyy' }}</span>
+                  </div>
+                </div>
+
+                <!-- Description content -->
+                <p class="text-slate-300 text-sm leading-relaxed whitespace-pre-wrap">
+                  {{ obs.descripcion }}
+                </p>
+
+                <!-- Reporter details -->
+                <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between text-[10px] font-semibold text-slate-500">
+                  <span class="flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5 text-slate-500">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                    </svg>
+                    Reportado por: {{ obs.docente.apellidos }}, {{ obs.docente.nombre }}
+                  </span>
+                  
+                  <span class="text-slate-600 font-mono">ID: {{ obs.id.substring(0, 8) }}...</span>
+                </div>
+              </div>
+
+            </div>
+          }
+        </div>
+      } @else {
+        <!-- Perfect Convivencia state -->
+        <div class="glass-panel border border-eco-500/10 bg-eco-500/5 rounded-3xl p-12 text-center max-w-xl mx-auto space-y-6 shadow-xl relative overflow-hidden">
+          <div class="w-20 h-20 bg-eco-500/10 rounded-full border border-eco-500/20 text-eco-400 flex items-center justify-center mx-auto shadow-inner animate-pulse">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-10 h-10">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12Z" />
+            </svg>
+          </div>
+          <div class="space-y-2">
+            <h3 class="text-2xl font-bold text-white">¡Historial Excelente!</h3>
+            <p class="text-slate-300 text-sm max-w-sm mx-auto">
+              No tienes ninguna observación disciplinaria en tu expediente. El Liceo Ecológico Manzanarez te felicita por mantener una convivencia sana y respetuosa en el aula.
+            </p>
+          </div>
+        </div>
+      }
+    }
+  }
+</div>

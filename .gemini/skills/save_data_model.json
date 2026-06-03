@@ -1,0 +1,17 @@
+{
+  "name": "save_data_model",
+  "description": "Guarda la estructura de una tabla o colección de la base de datos.",
+  "parameters": {
+    "type": "OBJECT",
+    "properties": {
+      "entity_name": { "type": "STRING", "description": "Nombre de la entidad, Ej: Estudiante, Calificacion" },
+      "attributes": { 
+        "type": "ARRAY", 
+        "items": { "type": "STRING" },
+        "description": "Lista de campos, Ej: 'id_documento (String)', 'promedio (Float)'" 
+      },
+      "relationships": { "type": "ARRAY", "items": { "type": "STRING" } }
+    },
+    "required": ["entity_name", "attributes"]
+  }
+}

@@ -1,0 +1,212 @@
+<div class="space-y-6">
+  <!-- Header with title & Year selector -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+        <span class="p-2 bg-eco-500/10 rounded-2xl border border-eco-500/20 text-eco-400">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-7 h-7">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.03 0 1.9.693 2.166 1.638m-7.377 0A48.536 48.536 0 0 1 12 3m0 0c-2.917 0-5.747.294-8.5.862m0 0a2.25 2.25 0 0 0-1.75 2.192V16.5A2.25 2.25 0 0 0 4 18.75h.007c.801 0 1.564-.32 2.122-.888L9 15.75" />
+          </svg>
+        </span>
+        Mi Boletín Académico
+      </h1>
+      <p class="text-slate-400 mt-2 font-medium">
+        Consulte sus calificaciones, promedios consolidados y nivelaciones registradas por sus docentes.
+      </p>
+    </div>
+
+    <!-- Year Dropdown filter -->
+    <div class="flex items-center gap-3 self-start md:self-auto shrink-0">
+      <label class="text-xs font-bold uppercase tracking-wider text-slate-400 font-mono">Año Lectivo:</label>
+      <select
+        [(ngModel)]="selectedYear"
+        (change)="onYearChange()"
+        class="bg-slate-900 border border-slate-700/50 text-white font-bold py-2.5 px-4 rounded-2xl text-sm focus:outline-none focus:border-eco-500 transition-all duration-200"
+      >
+        @for (y of availableYears; track y) {
+          <option [value]="y">{{ y }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <!-- Error Alerts -->
+  @if (errorMessage()) {
+    <div class="p-6 glass-panel border border-red-500/20 bg-red-500/5 rounded-3xl text-red-300 flex items-start gap-4 max-w-3xl mx-auto my-8">
+      <div class="p-3 bg-red-500/10 rounded-2xl border border-red-500/20 shrink-0 text-red-400">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-xl font-bold text-white">Notas no encontradas</h3>
+        <p class="text-slate-300 mt-2 text-sm leading-relaxed">{{ errorMessage() }}</p>
+      </div>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <!-- Skeletons -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="glass-panel border border-white/5 rounded-3xl p-6 space-y-4 animate-pulse">
+          <div class="flex items-center justify-between">
+            <div class="h-6 w-1/2 bg-slate-800 rounded-lg"></div>
+            <div class="h-8 w-12 bg-slate-800 rounded-xl"></div>
+          </div>
+          <div class="grid grid-cols-4 gap-4 pt-4 border-t border-slate-800">
+            @for (p of [1,2,3,4]; track p) {
+              <div class="text-center space-y-2">
+                <div class="h-4 w-8 bg-slate-800 rounded mx-auto"></div>
+                <div class="h-6 w-12 bg-slate-800 rounded mx-auto"></div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    @if (boletin().length > 0) {
+      <!-- Overall Average Widget -->
+      <div class="glass-panel border border-white/5 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+        <div class="space-y-1 text-center md:text-left">
+          <h3 class="text-xl font-extrabold text-white">Promedio General Acumulado</h3>
+          <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider">
+            Consolidado ponderado de todas las asignaturas inscritas para el año escolar {{ selectedYear() }}
+          </p>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <!-- Colorful indicator box -->
+          <div
+            [class]="getGeneralAverage() >= 3.0 ? 'px-6 py-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 text-3xl font-black font-mono shadow-lg shadow-emerald-500/5' : 'px-6 py-4 rounded-2xl bg-red-950/40 border border-red-500/30 text-red-400 text-3xl font-black font-mono shadow-lg shadow-red-500/5'"
+          >
+            {{ getGeneralAverage() | number: '1.2-2' }}
+          </div>
+          <div>
+            @if (getGeneralAverage() >= 3.0) {
+              <span class="text-xs font-extrabold uppercase tracking-wider bg-emerald-950 text-eco-400 border border-eco-500/20 px-3 py-1.5 rounded-full block text-center">
+                Aprobando Año
+              </span>
+            } @else {
+              <span class="text-xs font-extrabold uppercase tracking-wider bg-red-950/50 text-red-400 border border-red-500/20 px-3 py-1.5 rounded-full block text-center">
+                Reprobando Año
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid of Subjects -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        @for (materia of boletin(); track materia.asignatura_id) {
+          <div class="glass-card hover:glass-panel border border-white/5 hover:border-white/10 rounded-3xl p-6 transition-all duration-300 shadow-lg flex flex-col justify-between group">
+            
+            <!-- Subject Header -->
+            <div>
+              <div class="flex items-start justify-between gap-4 mb-4">
+                <div>
+                  <h3 class="text-xl font-bold text-white group-hover:text-eco-400 transition-colors duration-200">
+                    {{ materia.asignatura_nombre }}
+                  </h3>
+                  <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mt-0.5">Asignatura escolar</span>
+                </div>
+                
+                <!-- Definitive Grade Circle Badge -->
+                <div class="text-right shrink-0">
+                  <div
+                    [class]="materia.promedio_definitivo >= 3.0 ? 'text-lg font-black font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-500/35 px-3 py-1 rounded-xl shadow' : 'text-lg font-black font-mono text-red-400 bg-red-950/40 border border-red-500/35 px-3 py-1 rounded-xl shadow'"
+                  >
+                    {{ materia.promedio_definitivo | number: '1.1-1' }}
+                  </div>
+                  <span class="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 mt-1 block">Promedio</span>
+                </div>
+              </div>
+
+              <!-- Period Grades Horizontal blocks -->
+              <div class="grid grid-cols-4 gap-3 pt-4 border-t border-white/5">
+                @for (nota of materia.notas_periodo; track nota.periodo_id) {
+                  <div class="bg-slate-950/45 border border-slate-900 rounded-2xl p-2.5 text-center relative hover:bg-slate-900/60 transition-all duration-200 group/period">
+                    <span class="text-[9px] font-extrabold text-slate-400 uppercase tracking-widest block mb-1">
+                      P{{ nota.periodo_numero }}
+                    </span>
+                    
+                    <span
+                      [class]="nota.nota_definitiva >= 3.0 ? 'text-sm font-black font-mono text-emerald-400 block' : 'text-sm font-black font-mono text-red-400 block'"
+                    >
+                      {{ nota.nota_definitiva | number: '1.1-1' }}
+                    </span>
+
+                    <!-- Remedial Indicator Badge -->
+                    @if (nota.nota_nivelacion !== null) {
+                      <span class="absolute -top-1.5 -right-1 flex h-4 w-4 rounded-full bg-yellow-500 border border-slate-950 text-[8px] font-bold text-slate-950 items-center justify-center cursor-help animate-pulse" title="Nivelación aplicada">
+                        N
+                      </span>
+                      
+                      <!-- Hover details context box -->
+                      <div class="hidden group-hover/period:block absolute z-20 top-full left-1/2 transform -translate-x-1/2 mt-2 bg-slate-900 border border-slate-800 text-[10px] text-slate-300 py-1.5 px-3.5 rounded-xl shadow-xl w-32 font-medium">
+                        <span class="text-[9px] font-bold uppercase text-yellow-400 block mb-0.5">Nivelado</span>
+                        <div class="flex justify-between font-mono">
+                          <span>Original:</span>
+                          <span class="text-white">{{ nota.nota_original | number: '1.1-1' }}</span>
+                        </div>
+                        <div class="flex justify-between font-mono">
+                          <span>Nivelación:</span>
+                          <span class="text-white font-bold">{{ nota.nota_nivelacion | number: '1.1-1' }}</span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                } @empty {
+                  <div class="col-span-4 py-3 text-center text-xs text-slate-500 italic font-medium">
+                    Ninguna calificación asentada en este periodo lectivo aún.
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Subject Footer Status -->
+            <div class="mt-5 pt-3 border-t border-white/5 flex items-center justify-between text-xs font-semibold text-slate-500">
+              <span class="flex items-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-eco-500/50">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12Z" />
+                </svg>
+                Asignatura Homologada
+              </span>
+              
+              @if (materia.promedio_definitivo >= 3.0) {
+                <span class="text-[9px] font-extrabold uppercase tracking-widest text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/20 shadow-sm animate-pulse">
+                  APROBADA
+                </span>
+              } @else if (materia.notas_periodo.length > 0) {
+                <span class="text-[9px] font-extrabold uppercase tracking-widest text-red-400 bg-red-950/45 px-2 py-0.5 rounded border border-red-500/20 shadow-sm">
+                  REPROBANDO
+                </span>
+              } @else {
+                <span class="text-[9px] font-extrabold uppercase tracking-widest text-slate-500 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+                  SIN CURSAR
+                </span>
+              }
+            </div>
+
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Empty state -->
+      <div class="glass-panel border border-white/5 rounded-3xl p-12 text-center max-w-xl mx-auto space-y-6 shadow-xl relative overflow-hidden">
+        <div class="w-20 h-20 bg-slate-900/50 rounded-full border border-white/5 text-slate-500 flex items-center justify-center mx-auto shadow-inner">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+          </svg>
+        </div>
+        <div class="space-y-2">
+          <h3 class="text-2xl font-bold text-white">Sin Notas Registradas</h3>
+          <p class="text-slate-400 text-sm max-w-sm mx-auto">
+            Actualmente no cuentas con calificaciones cargadas en el año lectivo {{ selectedYear() }}. Consulta con tus docentes si ya han asentado notas en el periodo.
+          </p>
+        </div>
+      </div>
+    }
+  }
+</div>

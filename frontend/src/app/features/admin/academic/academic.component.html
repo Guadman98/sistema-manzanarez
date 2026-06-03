@@ -1,0 +1,561 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-extrabold text-white tracking-tight">Gestión Académica</h1>
+      <p class="text-slate-400 text-sm mt-1">Administra la malla curricular, asignación de asignaturas a grados, docentes y matrículas.</p>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  @if (successMessage) {
+    <div class="p-4 bg-eco-950/30 border border-eco-500/30 text-eco-200 text-sm rounded-2xl flex items-center justify-between backdrop-blur-md">
+      <span class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-eco-400">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+        </svg>
+        {{ successMessage }}
+      </span>
+      <button (click)="successMessage = ''" class="text-eco-400 hover:text-white font-bold">&times;</button>
+    </div>
+  }
+  @if (errorMessage) {
+    <div class="p-4 bg-red-950/40 border border-red-500/30 text-red-200 text-sm rounded-2xl flex items-center justify-between backdrop-blur-md">
+      <span class="flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-red-400">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+        </svg>
+        {{ errorMessage }}
+      </span>
+      <button (click)="errorMessage = ''" class="text-red-400 hover:text-white font-bold">&times;</button>
+    </div>
+  }
+
+  <!-- Tab Navigation -->
+  <div class="flex gap-2 border-b border-white/5 pb-2">
+    <button
+      type="button"
+      (click)="activeTab = 'malla'"
+      [class]="activeTab === 'malla' ? 'px-6 py-2.5 bg-eco-600 text-white rounded-xl font-bold transition-all duration-200' : 'px-6 py-2.5 text-slate-400 hover:text-white font-bold transition-all duration-200'"
+    >
+      Malla Académica
+    </button>
+    <button
+      type="button"
+      (click)="activeTab = 'matriculas'"
+      [class]="activeTab === 'matriculas' ? 'px-6 py-2.5 bg-eco-600 text-white rounded-xl font-bold transition-all duration-200' : 'px-6 py-2.5 text-slate-400 hover:text-white font-bold transition-all duration-200'"
+    >
+      Matrículas de Estudiantes
+    </button>
+    <button
+      type="button"
+      (click)="activeTab = 'periodos'"
+      [class]="activeTab === 'periodos' ? 'px-6 py-2.5 bg-eco-600 text-white rounded-xl font-bold transition-all duration-200' : 'px-6 py-2.5 text-slate-400 hover:text-white font-bold transition-all duration-200'"
+    >
+      Periodos Académicos
+    </button>
+  </div>
+
+  @if (isLoading) {
+    <div class="p-12 text-center flex flex-col items-center justify-center gap-4">
+      <svg class="animate-spin h-8 w-8 text-eco-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <span class="text-slate-400 text-sm">Sincronizando registros académicos...</span>
+    </div>
+  } @else {
+    <!-- TAB 1: MALLA ACADÉMICA -->
+    @if (activeTab === 'malla') {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Sidebar Column: Creations -->
+        <div class="space-y-6">
+          <!-- Crear Grado -->
+          <div class="glass-panel p-6 rounded-3xl border border-white/5 space-y-4 shadow-lg">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <span class="p-1.5 bg-eco-500/10 rounded-lg text-eco-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+              </span>
+              Crear Grado Escolar
+            </h3>
+            <form [formGroup]="gradoForm" (ngSubmit)="crearGrado()" class="space-y-4">
+              <div>
+                <input
+                  type="text"
+                  formControlName="nombre"
+                  placeholder="Ej: 6to A, 11vo B"
+                  class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-eco-500 transition-all duration-200"
+                />
+              </div>
+              <button
+                type="submit"
+                [disabled]="gradoForm.invalid"
+                class="w-full bg-eco-600 hover:bg-eco-500 text-white font-semibold py-2 rounded-xl transition-colors duration-200 disabled:opacity-50"
+              >
+                Agregar Grado
+              </button>
+            </form>
+          </div>
+
+          <!-- Crear Asignatura -->
+          <div class="glass-panel p-6 rounded-3xl border border-white/5 space-y-4 shadow-lg">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <span class="p-1.5 bg-blue-500/10 rounded-lg text-blue-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+              </span>
+              Crear Asignatura
+            </h3>
+            <form [formGroup]="asignaturaForm" (ngSubmit)="crearAsignatura()" class="space-y-4">
+              <div>
+                <input
+                  type="text"
+                  formControlName="nombre"
+                  placeholder="Ej: Matemáticas, Biología"
+                  class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-eco-500 transition-all duration-200"
+                />
+              </div>
+              <button
+                type="submit"
+                [disabled]="asignaturaForm.invalid"
+                class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2 rounded-xl transition-colors duration-200 disabled:opacity-50"
+              >
+                Agregar Materia
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Main Column: Linking & Asignment -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Vincular Materia a Grado -->
+            <div class="glass-panel p-6 rounded-3xl border border-white/5 space-y-4 shadow-lg">
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <span class="p-1.5 bg-purple-500/10 rounded-lg text-purple-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                  </svg>
+                </span>
+                Vincular Materia a Grado
+              </h3>
+              <form [formGroup]="vincularForm" (ngSubmit)="vincularMateria()" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Selecciona Grado</label>
+                  <select
+                    formControlName="grado_id"
+                    class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-eco-500 transition-all duration-200"
+                  >
+                    <option value="" disabled>-- Elige un Grado --</option>
+                    @for (grado of grados; track grado.id) {
+                      <option [value]="grado.id">{{ grado.nombre }}</option>
+                    }
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Selecciona Asignatura</label>
+                  <select
+                    formControlName="asignatura_id"
+                    class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-eco-500 transition-all duration-200"
+                  >
+                    <option value="" disabled>-- Elige una Asignatura --</option>
+                    @for (asig of asignaturas; track asig.id) {
+                      <option [value]="asig.id">{{ asig.nombre }}</option>
+                    }
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  [disabled]="vincularForm.invalid"
+                  class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2.5 rounded-xl transition-colors duration-200 disabled:opacity-50"
+                >
+                  Vincular Currículo
+                </button>
+              </form>
+            </div>
+
+            <!-- Asignar Docente a Clase -->
+            <div class="glass-panel p-6 rounded-3xl border border-white/5 space-y-4 shadow-lg">
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <span class="p-1.5 bg-emerald-500/10 rounded-lg text-emerald-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0z" />
+                  </svg>
+                </span>
+                Asignar Docente a Clase
+              </h3>
+              <form [formGroup]="asignarDocenteForm" (ngSubmit)="asignarDocente()" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Selecciona Docente</label>
+                  <select
+                    formControlName="docente_id"
+                    class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-eco-500 transition-all duration-200"
+                  >
+                    <option value="" disabled>-- Elige un Docente --</option>
+                    @for (t of teachers; track t.id) {
+                      <option [value]="t.id">{{ t.apellidos }}, {{ t.nombre }}</option>
+                    }
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Selecciona Malla Académica</label>
+                  <select
+                    formControlName="plan_estudio_id"
+                    class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-eco-500 transition-all duration-200"
+                  >
+                    <option value="" disabled>-- Elige Materia y Grado --</option>
+                    @for (plan of planes; track plan.id) {
+                      <option [value]="plan.id">{{ plan.grado.nombre }} - {{ plan.asignatura.nombre }}</option>
+                    }
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  [disabled]="asignarDocenteForm.invalid"
+                  class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2.5 rounded-xl transition-colors duration-200 disabled:opacity-50"
+                >
+                  Asignar Docente
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <!-- Summary Table: Linked Subjects & Assignments -->
+          <div class="glass-panel rounded-3xl border border-white/5 overflow-hidden">
+            <h3 class="text-sm font-bold text-white uppercase p-5 border-b border-white/5 tracking-wider">Malla Curricular & Docentes Activos</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-900/40 text-slate-300 text-xs font-semibold uppercase tracking-wider border-b border-white/5">
+                    <th class="p-4">Grado</th>
+                    <th class="p-4">Asignatura</th>
+                    <th class="p-4">Docente Asignado</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  @for (plan of planes; track plan.id) {
+                    <tr class="hover:bg-white/5 transition-colors">
+                      <td class="p-4 font-bold text-white text-sm">{{ plan.grado.nombre }}</td>
+                      <td class="p-4 text-slate-300 text-sm">{{ plan.asignatura.nombre }}</td>
+                      <td class="p-4 text-sm">
+                        <!-- Buscar si este plan tiene docente asignado -->
+                        @if (getAsignacion(plan.id); as asig) {
+                          <span class="text-eco-400 font-semibold">{{ asig.docente.apellidos }}, {{ asig.docente.nombre }}</span>
+                        } @else {
+                          <span class="text-red-400 font-medium italic">Sin profesor asignado</span>
+                        }
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="3" class="p-12 text-center text-slate-500 text-sm font-medium">No se han registrado vinculaciones en la malla académica aún.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- TAB 2: MATRÍCULAS DE ESTUDIANTES -->
+    @if (activeTab === 'matriculas') {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left: Form -->
+        <div>
+          <div class="glass-panel p-6 rounded-3xl border border-white/5 space-y-4 shadow-lg">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <span class="p-1.5 bg-eco-500/10 rounded-lg text-eco-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </span>
+              Matricular Alumno
+            </h3>
+            <form [formGroup]="matricularForm" (ngSubmit)="matricularEstudiante()" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Estudiante</label>
+                <select
+                  formControlName="estudiante_id"
+                  class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-eco-500 transition-all duration-200"
+                >
+                  <option value="" disabled>-- Elige un Estudiante --</option>
+                  @for (s of students; track s.id) {
+                    <option [value]="s.id">{{ s.apellidos }}, {{ s.nombre }} ({{ s.documento_identidad }})</option>
+                  }
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Grado</label>
+                <select
+                  formControlName="grado_id"
+                  class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-eco-500 transition-all duration-200"
+                >
+                  <option value="" disabled>-- Elige un Grado --</option>
+                  @for (grado of grados; track grado.id) {
+                    <option [value]="grado.id">{{ grado.nombre }}</option>
+                  }
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-slate-400 uppercase mb-2">Año Lectivo</label>
+                <input
+                  type="number"
+                  formControlName="ano_lectivo"
+                  class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white focus:outline-none focus:border-eco-500 transition-all duration-200"
+                />
+              </div>
+
+              <button
+                type="submit"
+                [disabled]="matricularForm.invalid"
+                class="w-full bg-eco-600 hover:bg-eco-500 text-white font-semibold py-3 rounded-xl transition-colors duration-200 disabled:opacity-50"
+              >
+                Matricular Estudiante
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Right: Matriculas List -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="glass-panel rounded-3xl border border-white/5 overflow-hidden">
+            <h3 class="text-sm font-bold text-white uppercase p-5 border-b border-white/5 tracking-wider">Historial de Matrículas Activas</h3>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-900/40 text-slate-300 text-xs font-semibold uppercase tracking-wider border-b border-white/5">
+                    <th class="p-4">Estudiante</th>
+                    <th class="p-4">Documento</th>
+                    <th class="p-4">Grado Asignado</th>
+                    <th class="p-4">Año Lectivo</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  @for (m of matriculas; track m.id) {
+                    <tr class="hover:bg-white/5 transition-colors">
+                      <td class="p-4">
+                        <span class="font-bold text-white block text-sm">{{ m.estudiante.apellidos }}, {{ m.estudiante.nombre }}</span>
+                        <span class="text-slate-500 text-xs mt-0.5 block">{{ m.estudiante.email }}</span>
+                      </td>
+                      <td class="p-4 font-mono text-slate-300 text-sm">{{ m.estudiante.documento_identidad }}</td>
+                      <td class="p-4 text-sm font-bold text-eco-400">{{ m.grado.nombre }}</td>
+                      <td class="p-4 text-slate-300 font-mono text-sm">{{ m.ano_lectivo }}</td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="4" class="p-12 text-center text-slate-500 text-sm font-medium">Ningún estudiante matriculado registrado.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- TAB 3: GESTIÓN DE PERIODOS -->
+    @if (activeTab === 'periodos') {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Columna 1: Crear Periodo (Formulario) -->
+        <div class="space-y-6">
+          <div class="glass-panel p-6 rounded-3xl border border-white/5 space-y-4 shadow-lg">
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <span class="p-1.5 bg-eco-500/10 rounded-lg text-eco-400">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+              </span>
+              Crear Periodo Académico
+            </h3>
+            
+            <form [formGroup]="periodoForm" (ngSubmit)="crearPeriodo()" class="space-y-4">
+              <!-- Número de Periodo -->
+              <div>
+                <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Número de Periodo</label>
+                <select
+                  formControlName="numero"
+                  class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-eco-500 transition-all duration-200 font-medium"
+                >
+                  <option value="" disabled selected>Selecciona el periodo...</option>
+                  <option [value]="1">Periodo 1</option>
+                  <option [value]="2">Periodo 2</option>
+                  <option [value]="3">Periodo 3</option>
+                  <option [value]="4">Periodo 4</option>
+                  <option [value]="5">Periodo 5</option>
+                </select>
+              </div>
+
+              <!-- Nombre del Periodo -->
+              <div>
+                <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Nombre descriptivo</label>
+                <input
+                  type="text"
+                  formControlName="nombre"
+                  placeholder="Ej: Primer Bimestre, Primer Trimestre"
+                  class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-eco-500 transition-all duration-200 font-medium"
+                />
+              </div>
+
+              <!-- Año Lectivo -->
+              <div>
+                <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2">Año Lectivo</label>
+                <input
+                  type="number"
+                  formControlName="ano_lectivo"
+                  placeholder="Ej: 2026"
+                  class="w-full bg-slate-900 border border-slate-700/50 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-eco-500 transition-all duration-200 font-medium"
+                />
+              </div>
+
+              <!-- Botón Crear -->
+              <button
+                type="submit"
+                [disabled]="periodoForm.invalid"
+                class="w-full bg-eco-600 hover:bg-eco-500 text-white font-bold py-2.5 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-eco-550/20"
+              >
+                Crear Periodo
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Columna 2: Historial y Controles (Tabla) -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="glass-panel p-6 rounded-3xl border border-white/5 space-y-6 shadow-lg">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <span class="p-1.5 bg-eco-500/10 rounded-lg text-eco-400">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5" />
+                  </svg>
+                </span>
+                Control de Periodos Académicos
+              </h3>
+            </div>
+
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="bg-slate-900/40 text-slate-300 text-xs font-semibold uppercase tracking-wider border-b border-white/5">
+                    <th class="p-4">Periodo / Nombre</th>
+                    <th class="p-4">Año Lectivo</th>
+                    <th class="p-4">Estado</th>
+                    <th class="p-4 text-right">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/5">
+                  @for (p of periodos; track p.id) {
+                    <tr class="hover:bg-white/5 transition-colors">
+                      <td class="p-4">
+                        <span class="font-bold text-white block text-sm">Periodo {{ p.numero }}</span>
+                        <span class="text-slate-500 text-xs mt-0.5 block font-medium">{{ p.nombre }}</span>
+                      </td>
+                      <td class="p-4 font-mono text-slate-300 text-sm">{{ p.ano_lectivo }}</td>
+                      <td class="p-4">
+                        @if (p.cerrado) {
+                          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-950/40 border border-red-500/30 text-red-400">
+                            <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                            Cerrado
+                          </span>
+                        } @else if (p.activo) {
+                          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-eco-950/40 border border-eco-500/30 text-eco-400 animate-pulse">
+                            <span class="w-1.5 h-1.5 rounded-full bg-eco-500 animate-ping"></span>
+                            Activo
+                          </span>
+                        } @else {
+                          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-slate-800 border border-slate-700 text-slate-400">
+                            <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                            Inactivo
+                          </span>
+                        }
+                      </td>
+                      <td class="p-4 text-right">
+                        @if (!p.cerrado) {
+                          <div class="flex items-center justify-end gap-2">
+                            @if (!p.activo) {
+                              <button
+                                (click)="activarPeriodo(p.id)"
+                                class="px-3.5 py-1.5 bg-eco-600/10 hover:bg-eco-600 border border-eco-500/20 text-eco-400 hover:text-white rounded-xl text-xs font-bold transition-all duration-200 shadow-md"
+                              >
+                                Activar
+                              </button>
+                            }
+                            <button
+                              (click)="showConfirmCierreId = p.id"
+                              class="px-3.5 py-1.5 bg-red-500/10 hover:bg-red-500 border border-red-500/20 text-red-400 hover:text-white rounded-xl text-xs font-bold flex items-center gap-1 transition-all duration-200 shadow-md"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" />
+                              </svg>
+                              Cerrar
+                            </button>
+                          </div>
+                        } @else {
+                          <span class="text-xs text-slate-500 italic">Sin acciones</span>
+                        }
+                      </td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="4" class="p-12 text-center text-slate-500 text-sm font-medium">Ningún periodo académico registrado.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>
+
+<!-- MODAL DE CONFIRMACIÓN DE CIERRE -->
+@if (showConfirmCierreId) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md transition-all duration-300">
+    <div class="glass-panel p-6 rounded-3xl border border-red-500/20 max-w-md w-full shadow-2xl space-y-6 bg-slate-900/90 text-left">
+      <div class="flex items-center gap-3 text-red-400">
+        <div class="p-2 bg-red-500/10 rounded-2xl animate-pulse">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
+          </svg>
+        </div>
+        <h3 class="text-xl font-extrabold tracking-tight text-white">¿Cerrar Periodo?</h3>
+      </div>
+
+      <div class="space-y-3 text-sm text-slate-300 leading-relaxed font-medium">
+        <p><strong>¡Atención!</strong> Esta acción es completamente <strong>irreversible</strong>.</p>
+        <ul class="list-disc pl-5 space-y-2 text-slate-400 text-xs">
+          <li>Se bloqueará definitivamente el ingreso y modificación de notas en este periodo.</li>
+          <li>Todas las notas se consolidarán automáticamente como definitivas finales.</li>
+          <li>Los docentes no podrán modificar calificaciones ni registrar nivelaciones para este periodo.</li>
+        </ul>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button
+          type="button"
+          (click)="showConfirmCierreId = null"
+          class="px-4.5 py-2.5 bg-slate-800 hover:bg-slate-700 border border-slate-700/50 text-slate-300 font-bold rounded-xl text-sm transition-all duration-200 cursor-pointer"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          (click)="cerrarPeriodo(showConfirmCierreId!)"
+          class="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-extrabold rounded-xl text-sm shadow-lg shadow-red-650/20 transition-all duration-200 cursor-pointer"
+        >
+          Sí, Cerrar Definitivamente
+        </button>
+      </div>
+    </div>
+  </div>
+}

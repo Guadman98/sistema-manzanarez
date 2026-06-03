@@ -1,0 +1,4 @@
+/* Specific animations for classes component */
+.group:hover img {
+  transform: rotate(5deg) scale(1.05);
+}

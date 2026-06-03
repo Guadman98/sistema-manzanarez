@@ -1,0 +1,14 @@
+{
+  "name": "save_user_story",
+  "description": "Guarda un requerimiento funcional detallado (Historia de Usuario) en un archivo Markdown.",
+  "parameters": {
+    "type": "OBJECT",
+    "properties": {
+      "module_name": { "type": "STRING", "description": "Ej: Gestion_Academica, Certificados, Autenticacion" },
+      "role": { "type": "STRING", "description": "Ej: Administrador, Profesor, Estudiante" },
+      "feature_description": { "type": "STRING", "description": "Lo que el usuario necesita hacer y por qué." },
+      "acceptance_criteria": { "type": "ARRAY", "items": { "type": "STRING" }, "description": "Lista de condiciones que deben cumplirse para que la función esté completa." }
+    },
+    "required": ["module_name", "role", "feature_description", "acceptance_criteria"]
+  }
+}

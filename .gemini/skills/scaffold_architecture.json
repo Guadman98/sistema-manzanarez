@@ -1,0 +1,11 @@
+{
+  "name": "scaffold_architecture",
+  "description": "Ejecuta comandos de terminal para inicializar repositorios y crear la estructura base de carpetas.",
+  "parameters": {
+    "type": "OBJECT",
+    "properties": {
+      "project_name": { "type": "STRING" },
+      "stack_components": { "type": "ARRAY", "items": { "type": "STRING" } }
+    }
+  }
+}

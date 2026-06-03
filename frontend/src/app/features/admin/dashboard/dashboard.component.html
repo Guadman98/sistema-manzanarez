@@ -1,0 +1,195 @@
+<div class="space-y-8">
+  <!-- Title / Welcome -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-extrabold text-white tracking-tight">Dashboard General</h1>
+      <p class="text-slate-400 text-sm mt-1">Estadísticas rápidas y resumen del Liceo Ecológico Manzanarez.</p>
+    </div>
+    <button
+      type="button"
+      (click)="loadStats()"
+      class="px-4 py-2.5 bg-eco-600 hover:bg-eco-500 text-white text-sm font-semibold rounded-xl flex items-center gap-2 self-start transition-colors duration-200 shadow-md hover:shadow-eco-500/10"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+      </svg>
+      Actualizar Datos
+    </button>
+  </div>
+
+  @if (isLoading) {
+    <!-- Skeleton loader grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      @for (i of [1, 2, 3, 4]; track i) {
+        <div class="glass-panel p-6 rounded-2xl border border-white/5 animate-pulse space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="w-12 h-12 bg-slate-800 rounded-xl"></div>
+            <div class="w-16 h-8 bg-slate-800 rounded-lg"></div>
+          </div>
+          <div class="space-y-2">
+            <div class="w-24 h-4 bg-slate-800 rounded"></div>
+            <div class="w-32 h-3 bg-slate-800 rounded"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (errorMessage) {
+    <div class="p-6 bg-red-950/40 border border-red-500/30 text-red-200 rounded-2xl flex items-start gap-4 backdrop-blur-md">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6 text-red-400 shrink-0 mt-0.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+      </svg>
+      <div>
+        <h4 class="font-bold text-white text-base">Error al cargar datos</h4>
+        <p class="text-sm text-red-300 mt-1">{{ errorMessage }}</p>
+      </div>
+    </div>
+  } @else {
+    <!-- Stats Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Students -->
+      <div class="glass-panel p-6 rounded-2xl border border-white/5 hover:border-eco-500/20 transition-all duration-300 group shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <div class="p-3 bg-eco-500/10 rounded-xl border border-eco-500/20 text-eco-400 group-hover:scale-110 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.57 50.57 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.902 59.902 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
+            </svg>
+          </div>
+          <span class="text-3xl font-extrabold text-white font-mono">{{ stats.studentsCount }}</span>
+        </div>
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Estudiantes</p>
+        <span class="text-slate-500 text-xs mt-1 block">Matriculados en el sistema</span>
+      </div>
+
+      <!-- Teachers -->
+      <div class="glass-panel p-6 rounded-2xl border border-white/5 hover:border-eco-500/20 transition-all duration-300 group shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <div class="p-3 bg-emerald-500/10 rounded-xl border border-emerald-500/20 text-emerald-400 group-hover:scale-110 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+            </svg>
+          </div>
+          <span class="text-3xl font-extrabold text-white font-mono">{{ stats.teachersCount }}</span>
+        </div>
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Docentes</p>
+        <span class="text-slate-500 text-xs mt-1 block">Asignados a mallas escolares</span>
+      </div>
+
+      <!-- Malla Curricular (Grados) -->
+      <div class="glass-panel p-6 rounded-2xl border border-white/5 hover:border-eco-500/20 transition-all duration-300 group shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <div class="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20 text-blue-400 group-hover:scale-110 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+            </svg>
+          </div>
+          <span class="text-3xl font-extrabold text-white font-mono">{{ stats.gradosCount }}</span>
+        </div>
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Grados Académicos</p>
+        <span class="text-slate-500 text-xs mt-1 block">Cursos activos (Ej: 6to A)</span>
+      </div>
+
+      <!-- Pending Certificates -->
+      <div class="glass-panel p-6 rounded-2xl border border-white/5 hover:border-eco-500/20 transition-all duration-300 group shadow-lg">
+        <div class="flex items-center justify-between mb-4">
+          <div class="p-3 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-400 group-hover:scale-110 transition-transform duration-300">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z" />
+            </svg>
+          </div>
+          <span class="text-3xl font-extrabold text-white font-mono">{{ stats.pendingCertificatesCount }}</span>
+        </div>
+        <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Solicitudes Pendientes</p>
+        <span class="text-slate-500 text-xs mt-1 block">Certificados por aprobar</span>
+      </div>
+    </div>
+
+    <!-- Quick Actions & General Status -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+      <!-- Quick Actions Card -->
+      <div class="glass-panel p-6 rounded-3xl border border-white/5 lg:col-span-2">
+        <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 text-eco-400">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" />
+          </svg>
+          Accesos Rápidos
+        </h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <a
+            routerLink="/admin/users"
+            class="p-4 rounded-2xl border border-white/5 bg-slate-900/40 hover:bg-white/5 flex items-center gap-4 transition-all duration-200 group"
+          >
+            <div class="p-2.5 bg-eco-500/10 rounded-xl text-eco-400 group-hover:scale-105 transition-transform duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M18 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0zM3 19.235v-.11a6.375 6.375 0 0 1 12.75 0v.109A12.318 12.318 0 0 1 9.374 21c-2.331 0-4.512-.647-6.374-1.766z" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white leading-tight">Registrar Usuario</h4>
+              <span class="text-slate-400 text-xs mt-0.5 block">Crear nuevos docentes o estudiantes</span>
+            </div>
+          </a>
+
+          <a
+            routerLink="/admin/academic"
+            class="p-4 rounded-2xl border border-white/5 bg-slate-900/40 hover:bg-white/5 flex items-center gap-4 transition-all duration-200 group"
+          >
+            <div class="p-2.5 bg-blue-500/10 rounded-xl text-blue-400 group-hover:scale-105 transition-transform duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white leading-tight">Configurar Grados</h4>
+              <span class="text-slate-400 text-xs mt-0.5 block">Crear cursos y vincular mallas</span>
+            </div>
+          </a>
+
+          <a
+            routerLink="/admin/academic"
+            class="p-4 rounded-2xl border border-white/5 bg-slate-900/40 hover:bg-white/5 flex items-center gap-4 transition-all duration-200 group"
+          >
+            <div class="p-2.5 bg-emerald-500/10 rounded-xl text-emerald-400 group-hover:scale-105 transition-transform duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white leading-tight">Asignación Docente</h4>
+              <span class="text-slate-400 text-xs mt-0.5 block">Vincular profesores a materias</span>
+            </div>
+          </a>
+
+          <a
+            routerLink="/admin/certificates"
+            class="p-4 rounded-2xl border border-white/5 bg-slate-900/40 hover:bg-white/5 flex items-center gap-4 transition-all duration-200 group"
+          >
+            <div class="p-2.5 bg-amber-500/10 rounded-xl text-amber-400 group-hover:scale-105 transition-transform duration-200">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 0 13.5 2.25H15a2.25 2.25 0 0 0 2.25 2.25M6.75 21.75h10.5A2.25 2.25 0 0 0 19.5 19.5V6.25A2.25 2.25 0 0 0 17.25 4H6.75A2.25 2.25 0 0 0 4.5 6.25v13.25A2.25 2.25 0 0 0 6.75 21.75Z" />
+              </svg>
+            </div>
+            <div>
+              <h4 class="text-sm font-bold text-white leading-tight">Aprobar Certificados</h4>
+              <span class="text-slate-400 text-xs mt-0.5 block">Visualizar y autorizar certificados</span>
+            </div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Educational Vision Card -->
+      <div class="glass-panel p-6 rounded-3xl border border-white/5 flex flex-col justify-between">
+        <div>
+          <h3 class="text-lg font-bold text-white mb-2">Visión Ecológica</h3>
+          <p class="text-slate-400 text-xs leading-relaxed">
+            "Sembrar el conocimiento hoy para cosechar la sustentabilidad del mañana."
+            El Liceo Ecológico Manzanarez está comprometido con la educación de calidad y la conciencia ambiental mediante procesos eficientes y sin uso de papel.
+          </p>
+        </div>
+        <div class="mt-6 border-t border-white/5 pt-4 flex items-center justify-between">
+          <span class="text-xs text-slate-500">Versión del Sistema</span>
+          <span class="text-xs font-bold font-mono text-eco-400 bg-eco-500/10 px-2.5 py-1 rounded-lg border border-eco-500/20">v1.2.0</span>
+        </div>
+      </div>
+    </div>
+  }
+</div>

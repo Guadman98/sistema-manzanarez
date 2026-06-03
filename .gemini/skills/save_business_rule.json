@@ -1,0 +1,12 @@
+{
+  "name": "save_business_rule",
+  "description": "Documenta una regla de negocio estricta del colegio.",
+  "parameters": {
+    "type": "OBJECT",
+    "properties": {
+      "rule_name": { "type": "STRING" },
+      "logic_description": { "type": "STRING", "description": "Explicación paso a paso de la regla." }
+    },
+    "required": ["rule_name", "logic_description"]
+  }
+}
